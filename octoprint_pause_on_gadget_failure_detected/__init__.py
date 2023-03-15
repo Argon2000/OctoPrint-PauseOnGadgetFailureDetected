@@ -10,39 +10,36 @@ from __future__ import absolute_import
 # Take a look at the documentation on what other plugin mixins are available.
 
 import octoprint.plugin
+import flask
 
-class Pause_on_gadget_failure_detectedPlugin(octoprint.plugin.SettingsPlugin,
-    octoprint.plugin.AssetPlugin,
-    octoprint.plugin.TemplatePlugin
-):
+class PauseOnGadgetFailureDetectedPlugin(octoprint.plugin.BlueprintPlugin):
+    @octoprint.plugin.BlueprintPlugin.route("/hello_world", methods=["GET"])
+    def hello_world(self):
+        # This is a GET request and thus not subject to CSRF protection
+        return "Hello world!"
 
-    ##~~ SettingsPlugin mixin
+    @octoprint.plugin.BlueprintPlugin.route("/hello_you", methods=["POST"])
+    def hello_you(self):
+        # This is a POST request and thus subject to CSRF protection. It is not exempt.
+        return "Hello you!"
 
-    def get_settings_defaults(self):
-        return {
-            # put your plugin's default settings here
-        }
+    @octoprint.plugin.BlueprintPlugin.route("/hello_me", methods=["POST"])
+    @octoprint.plugin.BlueprintPlugin.csrf_exempt()
+    def hello_me(self):
+        # This is a POST request and thus subject to CSRF protection, but this one is exempt.
+        return "Hello me!"
 
-    ##~~ AssetPlugin mixin
-
-    def get_assets(self):
-        # Define your plugin's asset files to automatically include in the
-        # core UI here.
-        return {
-            "js": ["js/pause_on_gadget_failure_detected.js"],
-            "css": ["css/pause_on_gadget_failure_detected.css"],
-            "less": ["less/pause_on_gadget_failure_detected.less"]
-        }
+    def is_blueprint_csrf_protected(self):
+        return True
 
     ##~~ Softwareupdate hook
-
     def get_update_information(self):
         # Define the configuration for your plugin to use with the Software Update
         # Plugin here. See https://docs.octoprint.org/en/master/bundledplugins/softwareupdate.html
         # for details.
         return {
             "pause_on_gadget_failure_detected": {
-                "displayName": "Pause_on_gadget_failure_detected Plugin",
+                "displayName": "Pause on gadget failure detected",
                 "displayVersion": self._plugin_version,
 
                 # version check: github repository
@@ -60,7 +57,7 @@ class Pause_on_gadget_failure_detectedPlugin(octoprint.plugin.SettingsPlugin,
 # If you want your plugin to be registered within OctoPrint under a different name than what you defined in setup.py
 # ("OctoPrint-PluginSkeleton"), you may define that here. Same goes for the other metadata derived from setup.py that
 # can be overwritten via __plugin_xyz__ control properties. See the documentation for that.
-__plugin_name__ = "Pause_on_gadget_failure_detected Plugin"
+__plugin_name__ = "Pause on gadget failure detected"
 
 
 # Set the Python version your plugin is compatible with below. Recommended is Python 3 only for all new plugins.
@@ -70,7 +67,7 @@ __plugin_pythoncompat__ = ">=3,<4"  # Only Python 3
 
 def __plugin_load__():
     global __plugin_implementation__
-    __plugin_implementation__ = Pause_on_gadget_failure_detectedPlugin()
+    __plugin_implementation__ = PauseOnGadgetFailureDetectedPlugin()
 
     global __plugin_hooks__
     __plugin_hooks__ = {
