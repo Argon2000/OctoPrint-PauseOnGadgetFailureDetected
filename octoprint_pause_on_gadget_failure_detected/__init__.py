@@ -14,11 +14,7 @@ from flask import request
 from flask import jsonify
 
 class PauseOnGadgetFailureDetectedPlugin(octoprint.plugin.BlueprintPlugin):
-    @octoprint.plugin.BlueprintPlugin.route("/hello_world", methods=["GET"])
-    def hello_world(self):
-        return "Hello world!"
-
-    @octoprint.plugin.BlueprintPlugin.route("/pause_on_possible_failure", methods=["POST"])
+    @octoprint.plugin.BlueprintPlugin.route("/pause_on_possible_failure", methods=["POST", "GET"])
     @octoprint.plugin.BlueprintPlugin.csrf_exempt()
     def pause_on_possible_failure(self):
         self._logger.info("Pause on gadget failure detected: Got event")
