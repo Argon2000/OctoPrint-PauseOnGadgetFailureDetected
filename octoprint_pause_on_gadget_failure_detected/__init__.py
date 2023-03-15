@@ -10,24 +10,24 @@ from __future__ import absolute_import
 # Take a look at the documentation on what other plugin mixins are available.
 
 import octoprint.plugin
-import flask
+from flask import request
+from flask import jsonify
 
 class PauseOnGadgetFailureDetectedPlugin(octoprint.plugin.BlueprintPlugin):
     @octoprint.plugin.BlueprintPlugin.route("/hello_world", methods=["GET"])
     def hello_world(self):
-        # This is a GET request and thus not subject to CSRF protection
         return "Hello world!"
 
-    @octoprint.plugin.BlueprintPlugin.route("/hello_you", methods=["POST"])
-    def hello_you(self):
-        # This is a POST request and thus subject to CSRF protection. It is not exempt.
-        return "Hello you!"
-
-    @octoprint.plugin.BlueprintPlugin.route("/hello_me", methods=["POST"])
+    @octoprint.plugin.BlueprintPlugin.route("/pause_on_possible_failure", methods=["POST"])
     @octoprint.plugin.BlueprintPlugin.csrf_exempt()
-    def hello_me(self):
-        # This is a POST request and thus subject to CSRF protection, but this one is exempt.
-        return "Hello me!"
+    def pause_on_possible_failure(self):
+        self._logger.info("Pause on gadget failure detected: Got event")
+        self._logger.info("Pause on gadget failure detected: Is JSON: {}".format(request.is_json))
+        if request.is_json:
+            content = request.get_json()
+            self._logger.info("Pause on gadget failure detected: Content: {}".format(content))
+        resp = jsonify(success=True)
+        return resp
 
     def is_blueprint_csrf_protected(self):
         return True
