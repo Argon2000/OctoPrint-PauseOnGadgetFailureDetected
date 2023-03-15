@@ -1,0 +1,4 @@
+include README.md
+recursive-include octoprint_pause_on_gadget_failure_detected/templates *
+recursive-include octoprint_pause_on_gadget_failure_detected/translations *
+recursive-include octoprint_pause_on_gadget_failure_detected/static *
